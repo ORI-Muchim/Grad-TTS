@@ -48,7 +48,7 @@ Put necessary Grad-TTS and HiFi-GAN checkpoints into `checkpts` folder in root G
     ```bash
     python inference.py -f <your-text-file> -c <grad-tts-checkpoint> -t <number-of-timesteps> -s <speaker-id-if-multispeaker>
     ```
-4. Check out folder called `out` for generated audios.
+4. Check out folder called `outputs` for generated audios.
 
 You can also perform *interactive inference* by running Jupyter Notebook `inference.ipynb` or by using our [Google Colab Demo](https://colab.research.google.com/drive/1YNrXtkJQKcYDmIYJeyX8s5eXxB4zgpZI?usp=sharing).
 
