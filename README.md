@@ -30,7 +30,7 @@ cd model/monotonic_align; python setup.py build_ext --inplace; cd ../..
 
 ## Choose Cleaners
 
-* Fill "text_cleaners" in config.json
+* Fill "text_cleaners" in params.py
 * Edit text/symbols.py
 * Remove unnecessary imports from text/cleaners.py
 
