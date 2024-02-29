@@ -28,6 +28,12 @@ cd model/monotonic_align; python setup.py build_ext --inplace; cd ../..
 
 **Note**: code is tested on Python==3.8
 
+## Choose Cleaners
+
+* Fill "text_cleaners" in config.json
+* Edit text/symbols.py
+* Remove unnecessary imports from text/cleaners.py
+
 ## Inference
 
 You can download Grad-TTS and HiFi-GAN checkpoints trained on LJSpeech* and Libri-TTS datasets (22kHz) from [here](https://drive.google.com/drive/folders/1grsfccJbmEuSBGQExQKr3cVxNV0xEOZ7?usp=sharing).
