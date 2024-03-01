@@ -54,7 +54,7 @@ You can also perform *interactive inference* by running Jupyter Notebook `infere
 
 ## Training
 
-1. Make filelists of your audio data like ones included into `resources/filelists` folder. For single speaker training refer to `jspeech` filelists and to `libri-tts` filelists for multispeaker.
+1. Make filelists of your audio data like ones included into `resources/filelists` folder. For single speaker training refer to `ljspeech` filelists and to `libri-tts` filelists for multispeaker.
 2. Set experiment configuration in `params.py` file.
 3. Specify your GPU device and run training script:
     ```bash
