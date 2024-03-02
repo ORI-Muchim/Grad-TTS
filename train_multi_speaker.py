@@ -1,11 +1,3 @@
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the MIT License.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# MIT License for more details.
-
 import numpy as np
 from tqdm import tqdm
 
@@ -17,6 +9,7 @@ import params
 from model import GradTTS
 from data import TextMelSpeakerDataset, TextMelSpeakerBatchCollate
 from utils import plot_tensor, save_plot
+from utils import *
 from text.symbols import symbols
 
 
@@ -97,9 +90,11 @@ if __name__ == "__main__":
                          global_step=0, dataformats='HWC')
         save_plot(mel.squeeze(), f'{log_dir}/original_{i}.png')
 
+    model, optimizer, start_epoch, iteration = load_checkpoint(params.log_dir, model, optimizer)
+
     print('Start training...')
-    iteration = 0
-    for epoch in range(1, n_epochs + 1):
+    # iteration = 0
+    for epoch in range(start_epoch + 1, n_epochs + 1):
         model.eval()
         print('Synthesis...')
         with torch.no_grad():
@@ -159,12 +154,13 @@ if __name__ == "__main__":
                 logger.add_scalar('training/decoder_grad_norm', dec_grad_norm,
                                 global_step=iteration)
                 
-                msg = f'Epoch: {epoch}, iteration: {iteration} | dur_loss: {dur_loss.item()}, prior_loss: {prior_loss.item()}, diff_loss: {diff_loss.item()}'
+                msg = f'Epoch: {epoch}, iteration: {iteration} | dur_loss: {dur_loss.item():.5f}, prior_loss: {prior_loss.item():.5f}, diff_loss: {diff_loss.item():.5f}'
                 progress_bar.set_description(msg)
                 
                 dur_losses.append(dur_loss.item())
                 prior_losses.append(prior_loss.item())
                 diff_losses.append(diff_loss.item())
+
                 iteration += 1
 
         msg = 'Epoch %d: duration loss = %.3f ' % (epoch, np.mean(dur_losses))
@@ -176,5 +172,5 @@ if __name__ == "__main__":
         if epoch % params.save_every > 0:
             continue
         
-        ckpt = model.state_dict()
-        torch.save(ckpt, f=f"{log_dir}/grad_{epoch}.pt")
+        save_checkpoint(model, optimizer, epoch, iteration, log_dir)
+        print(f"Saved checkpoint to '{log_dir}/grad_{epoch}.pt'")

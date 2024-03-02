@@ -1,11 +1,3 @@
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the MIT License.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# MIT License for more details.
-
 import os
 import glob
 import numpy as np
@@ -30,19 +22,40 @@ def parse_filelist(filelist_path, split_char="|"):
 def latest_checkpoint_path(dir_path, regex="grad_*.pt"):
     f_list = glob.glob(os.path.join(dir_path, regex))
     f_list.sort(key=lambda f: int("".join(filter(str.isdigit, f))))
-    x = f_list[-1]
-    return x
+    if f_list:
+        x = f_list[-1]
+        return x
+    return None
 
 
-def load_checkpoint(logdir, model, num=None):
-    if num is None:
-        model_path = latest_checkpoint_path(logdir, regex="grad_*.pt")
+def load_checkpoint(logdir, model, optimizer=None):
+    checkpoint_path = latest_checkpoint_path(logdir)
+    if checkpoint_path:
+        print(f"Loading checkpoint '{checkpoint_path}'...")
+        checkpoint = torch.load(checkpoint_path)
+        model.load_state_dict(checkpoint['model_state'])
+        if optimizer and 'optimizer_state' in checkpoint:
+            optimizer.load_state_dict(checkpoint['optimizer_state'])
+        epoch = checkpoint.get('epoch', 1)
+        iteration = checkpoint.get('iteration', 0)
+        print(f"Checkpoint loaded: Epoch {epoch}, Iteration {iteration}")
     else:
-        model_path = os.path.join(logdir, f"grad_{num}.pt")
-    print(f'Loading checkpoint {model_path}...')
-    model_dict = torch.load(model_path, map_location=lambda loc, storage: loc)
-    model.load_state_dict(model_dict, strict=False)
-    return model
+        epoch, iteration = 0, 0
+        print("No checkpoint found, starting from scratch.")
+    return model, optimizer, epoch, iteration
+
+
+def save_checkpoint(model, optimizer, epoch, iteration, log_dir):
+    checkpoint = {
+        'model_state': model.state_dict(),
+        'optimizer_state': optimizer.state_dict(),
+        'epoch': epoch,
+        'iteration': iteration
+    }
+
+    print(f"Saving checkpoint: Epoch {epoch}, Iteration {iteration}")
+
+    torch.save(checkpoint, os.path.join(log_dir, f"grad_{epoch}.pt"))
 
 
 def save_figure_to_numpy(fig):

@@ -1,11 +1,3 @@
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the MIT License.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# MIT License for more details.
-
 import argparse
 import json
 import datetime as dt
@@ -88,8 +80,10 @@ if __name__ == '__main__':
                         params.filter_channels_dp, params.n_heads, params.n_enc_layers,
                         params.enc_kernel, params.enc_dropout, params.window_size,
                         params.n_feats, params.dec_dim, params.beta_min, params.beta_max, params.pe_scale)
-    generator.load_state_dict(torch.load(args.checkpoint, map_location=lambda loc, storage: loc))
+    checkpoint = torch.load(args.checkpoint, map_location=lambda loc, storage: loc) 
+    generator.load_state_dict(checkpoint['model_state'])
     _ = generator.cuda().eval()
+
     print(f'Number of parameters: {generator.nparams}')
     
     print('Initializing HiFi-GAN...')

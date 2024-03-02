@@ -1,11 +1,3 @@
-# Copyright (C) 2021. Huawei Technologies Co., Ltd. All rights reserved.
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the MIT License.
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# MIT License for more details.
-
 import numpy as np
 from tqdm import tqdm
 
@@ -17,6 +9,7 @@ import params
 from model import GradTTS
 from data import TextMelDataset, TextMelBatchCollate
 from utils import plot_tensor, save_plot
+from utils import *
 from text.symbols import symbols
 
 
@@ -94,9 +87,11 @@ if __name__ == "__main__":
                          global_step=0, dataformats='HWC')
         save_plot(mel.squeeze(), f'{log_dir}/original_{i}.png')
 
+    model, optimizer, start_epoch, iteration = load_checkpoint(params.log_dir, model, optimizer)
+
     print('Start training...')
-    iteration = 0
-    for epoch in range(1, n_epochs + 1):
+    # iteration = 0
+    for epoch in range(start_epoch + 1, n_epochs + 1):
         model.train()
         dur_losses = []
         prior_losses = []
@@ -134,7 +129,7 @@ if __name__ == "__main__":
                 diff_losses.append(diff_loss.item())
                 
                 if batch_idx % 5 == 0:
-                    msg = f'Epoch: {epoch}, iteration: {iteration} | dur_loss: {dur_loss.item()}, prior_loss: {prior_loss.item()}, diff_loss: {diff_loss.item()}'
+                    msg = f'Epoch: {epoch}, iteration: {iteration} | dur_loss: {dur_loss.item():.5f}, prior_loss: {prior_loss.item():.5f}, diff_loss: {diff_loss.item():.5f}'
                     progress_bar.set_description(msg)
                 
                 iteration += 1
@@ -145,31 +140,29 @@ if __name__ == "__main__":
         with open(f'{log_dir}/train.log', 'a') as f:
             f.write(log_msg)
 
-        if epoch % params.save_every > 0:
-            continue
+        if epoch % params.save_every == 0:
+            model.eval()
+            print('Synthesis...')
+            with torch.no_grad():
+                for i, item in enumerate(test_batch):
+                    x = item['x'].to(torch.long).unsqueeze(0).cuda()
+                    x_lengths = torch.LongTensor([x.shape[-1]]).cuda()
+                    y_enc, y_dec, attn = model(x, x_lengths, n_timesteps=50)
+                    logger.add_image(f'image_{i}/generated_enc',
+                                     plot_tensor(y_enc.squeeze().cpu()),
+                                     global_step=iteration, dataformats='HWC')
+                    logger.add_image(f'image_{i}/generated_dec',
+                                     plot_tensor(y_dec.squeeze().cpu()),
+                                     global_step=iteration, dataformats='HWC')
+                    logger.add_image(f'image_{i}/alignment',
+                                     plot_tensor(attn.squeeze().cpu()),
+                                     global_step=iteration, dataformats='HWC')
+                    save_plot(y_enc.squeeze().cpu(), 
+                              f'{log_dir}/generated_enc_{i}.png')
+                    save_plot(y_dec.squeeze().cpu(), 
+                              f'{log_dir}/generated_dec_{i}.png')
+                    save_plot(attn.squeeze().cpu(), 
+                              f'{log_dir}/alignment_{i}.png')
 
-        model.eval()
-        print('Synthesis...')
-        with torch.no_grad():
-            for i, item in enumerate(test_batch):
-                x = item['x'].to(torch.long).unsqueeze(0).cuda()
-                x_lengths = torch.LongTensor([x.shape[-1]]).cuda()
-                y_enc, y_dec, attn = model(x, x_lengths, n_timesteps=50)
-                logger.add_image(f'image_{i}/generated_enc',
-                                 plot_tensor(y_enc.squeeze().cpu()),
-                                 global_step=iteration, dataformats='HWC')
-                logger.add_image(f'image_{i}/generated_dec',
-                                 plot_tensor(y_dec.squeeze().cpu()),
-                                 global_step=iteration, dataformats='HWC')
-                logger.add_image(f'image_{i}/alignment',
-                                 plot_tensor(attn.squeeze().cpu()),
-                                 global_step=iteration, dataformats='HWC')
-                save_plot(y_enc.squeeze().cpu(), 
-                          f'{log_dir}/generated_enc_{i}.png')
-                save_plot(y_dec.squeeze().cpu(), 
-                          f'{log_dir}/generated_dec_{i}.png')
-                save_plot(attn.squeeze().cpu(), 
-                          f'{log_dir}/alignment_{i}.png')
-
-        ckpt = model.state_dict()
-        torch.save(ckpt, f=f"{log_dir}/grad_{epoch}.pt")
+            save_checkpoint(model, optimizer, epoch, iteration, log_dir)
+            print(f"Saved checkpoint to '{log_dir}/grad_{epoch}.pt'")
