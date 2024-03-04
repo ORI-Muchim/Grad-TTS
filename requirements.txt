@@ -1,5 +1,6 @@
 Cython==0.29.23
 #torch==1.9.0
+numpy==1.23.0
 matplotlib==3.3.3
 einops==0.3.0
 inflect==5.0.2
@@ -22,4 +23,3 @@ phonemizer
 monotonic_align
 absl-py==1.0.0
 certifi==2022.5.18.1
-numpy==1.23.0
