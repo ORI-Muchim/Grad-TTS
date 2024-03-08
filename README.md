@@ -36,13 +36,11 @@ cd model/monotonic_align; python setup.py build_ext --inplace; cd ../..
 
 ## Inference
 
-You can download Grad-TTS and HiFi-GAN checkpoints trained on LJSpeech* and Libri-TTS datasets (22kHz) from [here](https://drive.google.com/drive/folders/1grsfccJbmEuSBGQExQKr3cVxNV0xEOZ7?usp=sharing).
-
-***Note**: we open-source 2 checkpoints of Grad-TTS trained on LJSpeech. They are the same models but trained with different positional encoding scale: **x1** (`"grad-tts-old.pt"`, ICML 2021 sumbission model) and **x1000** (`"grad-tts.pt"`). To use the former set `params.pe_scale=1` and to use the latter set `params.pe_scale=1000`. Libri-TTS checkpoint was trained with scale **x1000**.
+You can download HiFi-GAN checkpoint trained on LJSpeech* and Libri-TTS datasets (22kHz) from [here](https://drive.google.com/drive/folders/1grsfccJbmEuSBGQExQKr3cVxNV0xEOZ7?usp=sharing).
 
 Put necessary Grad-TTS and HiFi-GAN checkpoints into `checkpts` folder in root Grad-TTS directory (note: in `inference.py` you can change default HiFi-GAN path).
 
-1. Create text file with sentences you want to synthesize like `resources/filelists/synthesis.txt`.
+1. Create text file with sentences you want to synthesize like `test.txt`.
 2. For single speaker set `params.n_spks=1` and for multispeaker (Libri-TTS) inference set `params.n_spks=247`.
 3. Run script `inference.py` by providing path to the text file, path to the Grad-TTS checkpoint, number of iterations to be used for reverse diffusion (default: 10) and speaker id if you want to perform multispeaker inference:
     ```bash
@@ -50,7 +48,7 @@ Put necessary Grad-TTS and HiFi-GAN checkpoints into `checkpts` folder in root G
     ```
 4. Check out folder called `outputs` for generated audios.
 
-You can also perform *interactive inference* by running Jupyter Notebook `inference.ipynb` or by using our [Google Colab Demo](https://colab.research.google.com/drive/1YNrXtkJQKcYDmIYJeyX8s5eXxB4zgpZI?usp=sharing).
+You can also perform *interactive inference* by running Jupyter Notebook `inference.ipynb`.
 
 ## Training
 
@@ -64,7 +62,7 @@ You can also perform *interactive inference* by running Jupyter Notebook `infere
     ```
 4. To track your training process run tensorboard server on any available port:
     ```bash
-    tensorboard --logdir=YOUR_LOG_DIR --port=8888
+    tensorboard --logdir=YOUR_LOG_DIR
     ```
     During training all logging information and checkpoints are stored in `YOUR_LOG_DIR`, which you can specify in `params.py` before training.
 
