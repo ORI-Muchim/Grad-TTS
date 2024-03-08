@@ -54,7 +54,6 @@ def save_checkpoint(model, optimizer, epoch, iteration, log_dir):
     }
 
     print(f"Saving checkpoint: Epoch {epoch}, Iteration {iteration}")
-
     torch.save(checkpoint, os.path.join(log_dir, f"grad_{epoch}.pt"))
 
 
