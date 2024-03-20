@@ -28,6 +28,18 @@ cd model/monotonic_align; python setup.py build_ext --inplace; cd ../..
 
 **Note**: code is tested on Python==3.8
 
+## Low-bit-optimizer Installation
+
+**Requirements**
+Python >= 3.7 + CUDA >= 11.0 + torch >= 1.13.0.
+
+To install run:
+
+```bash
+git clone https://github.com/thu-ml/low-bit-optimizers.git
+pip install -v -e .
+```
+
 ## Choose Cleaners
 
 * Fill "text_cleaners" in params.py
