@@ -83,7 +83,7 @@ You can also perform *interactive inference* by running Jupyter Notebook `infere
 * HiFi-GAN model is used as vocoder, official github repository: [link](https://github.com/jik876/hifi-gan).
 * Monotonic Alignment Search algorithm is used for unsupervised duration modelling, official github repository: [link](https://github.com/jaywalnut310/glow-tts).
 * text/cleaners.py [ORI-Muchim/PolyLangVITS](https://github.com/ORI-Muchim/PolyLangVITS)
-* [low-bit-optimizer](https://github.com/thu-ml/low-bit-optimizers)
+* [low-bit-optimizers](https://github.com/thu-ml/low-bit-optimizers)
 
 ## To-Do
 
