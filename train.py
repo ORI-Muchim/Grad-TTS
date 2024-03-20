@@ -12,6 +12,7 @@ from utils import plot_tensor, save_plot
 from utils import *
 from text.symbols import symbols
 
+import lpmm
 
 train_filelist_path = params.train_filelist_path
 valid_filelist_path = params.valid_filelist_path
@@ -77,7 +78,7 @@ if __name__ == "__main__":
     print('Total parameters: %.2fm' % (model.nparams/1e6))
 
     print('Initializing optimizer...')
-    optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
+    optimizer = lpmm.optim.AdamW(params=model.parameters(), lr=learning_rate)
 
     print('Logging test batch...')
     test_batch = test_dataset.sample_test_batch(size=params.test_size)

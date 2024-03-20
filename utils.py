@@ -57,6 +57,28 @@ def save_checkpoint(model, optimizer, epoch, iteration, log_dir):
     torch.save(checkpoint, os.path.join(log_dir, f"grad_{epoch}.pt"))
 
 
+def remove_optimizer_latest_checkpoint(dir_path, output_path, regex="G_*.pth"):
+    model_path = latest_checkpoint_path(dir_path, regex)
+    if model_path is None:
+        print("No latest checkpoint found.")
+        return
+
+    checkpoint_dict = torch.load(model_path, map_location='cpu')
+
+    if "optimizer" in checkpoint_dict:
+        checkpoint_dict_new = {k: v for k, v in checkpoint_dict.items() if k != "optimizer"}
+
+        base_name = os.path.basename(model_path)
+        new_base_name = os.path.splitext(base_name)[0] + "_rem_opti.pth"
+        new_output_path = os.path.join(output_path, new_base_name)
+        print("Optimizer state removed from the latest checkpoint.")
+
+        torch.save(checkpoint_dict_new, new_output_path)
+        print(f"Modified checkpoint saved to {new_output_path}")
+    else:
+        print("No optimizer state found in the latest checkpoint.")
+
+
 def save_figure_to_numpy(fig):
     data = np.fromstring(fig.canvas.tostring_rgb(), dtype=np.uint8, sep='')
     data = data.reshape(fig.canvas.get_width_height()[::-1] + (3,))
