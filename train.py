@@ -78,7 +78,7 @@ if __name__ == "__main__":
     print('Total parameters: %.2fm' % (model.nparams/1e6))
 
     print('Initializing optimizer...')
-    optimizer = lpmm.optim.AdamW(params=model.parameters(), lr=learning_rate)
+    optimizer = torch.optim.Adam(params=model.parameters(), lr=learning_rate)
 
     print('Logging test batch...')
     test_batch = test_dataset.sample_test_batch(size=params.test_size)
